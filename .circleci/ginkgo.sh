@@ -48,7 +48,7 @@ FINAL_ZIP_ALIAS=Karenulgink-${TANGGAL}.zip
 ##----------------------------------------------------------##
 # Specify compiler.
 
-COMPILER=azure
+COMPILER=cosmic
 
 ##----------------------------------------------------------##
 # Specify Linker
@@ -260,8 +260,8 @@ START=$(date +"%s")
 	       CC=clang \
            CROSS_COMPILE=aarch64-linux-gnu- \
            CROSS_COMPILE_ARM32=arm-linux-gnueabi \
-           LLVM=1 \
-           LLVM_IAS=1 \
+           #LLVM=1 \
+           #LLVM_IAS=1 \
            #AR=llvm-ar \
            #NM=llvm-nm \
            #LD=${LINKER} \
@@ -276,14 +276,14 @@ START=$(date +"%s")
 	       CC=clang \
 	       CROSS_COMPILE=aarch64-linux-gnu- \
 	       CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-	       LD=${LINKER} \
+	       #LD=${LINKER} \
 	       #LLVM=1 \
 	       #LLVM_IAS=1 \
-	       AR=llvm-ar \
-	       NM=llvm-nm \
-	       OBJCOPY=llvm-objcopy \
-	       OBJDUMP=llvm-objdump \
-	       STRIP=llvm-strip \
+	       #AR=llvm-ar \
+	       #NM=llvm-nm \
+	       #OBJCOPY=llvm-objcopy \
+	       #OBJDUMP=llvm-objdump \
+	       #STRIP=llvm-strip \
 	       V=$VERBOSE 2>&1 | tee error.log
 	elif [ -d ${KERNEL_DIR}/neutron ];
 	   then
@@ -292,7 +292,7 @@ START=$(date +"%s")
 	       CC=clang \
 	       CROSS_COMPILE=aarch64-linux-gnu- \
 	       CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-	       LD=${LINKER} \
+	       #LD=${LINKER} \
 	       #LLVM=1 \
 	       #LLVM_IAS=1 \
 	       AR=llvm-ar \
