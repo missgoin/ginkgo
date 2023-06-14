@@ -108,22 +108,25 @@ function cloneTC() {
 	git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9.git --single-branch --branch="lineage-19.0" gcc32
 	PATH="${KERNEL_DIR}/sdclang/bin:${KERNEL_DIR}/gcc/bin:${KERNEL_DIR}/gcc32/bin:${PATH}"
 
-	elif [ $COMPILER = "eva" ];
-	then
-	git clone --depth=1 https://github.com/mvaisakh/gcc-arm64.git -b gcc-new gcc64
-	git clone --depth=1 https://github.com/mvaisakh/gcc-arm.git -b gcc-new gcc32
-	PATH=$KERNEL_DIR/gcc64/bin/:$KERNEL_DIR/gcc32/bin/:/usr/bin:$PATH
-
 	elif [ $COMPILER = "aosp" ];
 	then
-        mkdir aosp-clang
-        cd aosp-clang || exit
-	wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/7d21a2e4192728bc50841994d88637ccc45b5692/clang-r468909b.tar.gz
-        tar -xf clang*
-        cd .. || exit
-	git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9.git -b lineage-19.1 gcc
+	wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/7d21a2e4192728bc50841994d88637ccc45b5692/clang-r468909b.tar.gz && mkdir aosp-clang && tar -xzvf clang-r468909b.tar.gz -C aosp-clang/
+	export KERNEL_CLANG_PATH="${KERNEL_DIR}/aosp-clang"
+    export KERNEL_CLANG="clang"
+    export PATH="$KERNEL_CLANG_PATH/bin:$PATH"
+    #CLANG_VERSION=$(clang --version | grep version | sed "s|clang version ||")
+    
+	git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9.git -b lineage-19.1 gcc64
+	export KERNEL_CCOMPILE64_PATH="${KERNEL_DIR}/gcc64"
+    export KERNEL_CCOMPILE64="aarch64-linux-android-"
+    export PATH="$KERNEL_CCOMPILE64_PATH/bin:$PATH"
+    GCC_VERSION=$(aarch64-linux-gnu-gcc --version | grep "(GCC)" | sed 's|.*) ||')
+	
 	git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9.git -b lineage-19.1 gcc32
-	PATH="${KERNEL_DIR}/aosp-clang/bin:${KERNEL_DIR}/gcc/bin:${KERNEL_DIR}/gcc32/bin:${PATH}"
+	export KERNEL_CCOMPILE32_PATH="${KERNEL_DIR}/gcc32"
+    export KERNEL_CCOMPILE32="arm-linux-androideabi-"
+    export PATH="$KERNEL_CCOMPILE32_PATH/bin:$PATH"
+
 	
 	fi
 	
@@ -143,10 +146,7 @@ function exports() {
            then
                export KBUILD_COMPILER_STRING=$(${KERNEL_DIR}/clang/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
                export LD_LIBRARY_PATH="${KERNEL_DIR}/clang/lib:$LD_LIBRARY_PATH"
-               
-        elif [ -d ${KERNEL_DIR}/gcc64 ];
-           then
-               export KBUILD_COMPILER_STRING=$("$KERNEL_DIR/gcc64"/bin/aarch64-elf-gcc --version | head -n 1)       
+           
         elif [ -d ${KERNEL_DIR}/cosmic ];
            then
                export KBUILD_COMPILER_STRING=$(${KERNEL_DIR}/cosmic/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
@@ -336,12 +336,10 @@ START=$(date +"%s")
        then
            make -kj$(nproc --all) O=out \
 	       ARCH=arm64 \
-	       CC=clang \
-           #HOSTCC=clang \
-	       #HOSTCXX=clang++ \
+	       CC=$KERNEL_CLANG \
 	       CLANG_TRIPLE=aarch64-linux-gnu- \
-	       CROSS_COMPILE=aarch64-linux-android- \
-	       CROSS_COMPILE_ARM32=arm-linux-androideabi- \
+	       CROSS_COMPILE=$KERNEL_CCOMPILE64 \
+	       CROSS_COMPILE_ARM32=$KERNEL_CCOMPILE32 \
 	       LD=${LINKER} \
 	       AR=llvm-ar \
 	       NM=llvm-nm \
@@ -351,6 +349,7 @@ START=$(date +"%s")
 	       #READELF=llvm-readelf \
 	       #OBJSIZE=llvm-size \
 	       V=$VERBOSE 2>&1 | tee error.log
+	       
 	fi
 	
 	echo "**** Verify Image.gz-dtb & dtbo.img ****"
