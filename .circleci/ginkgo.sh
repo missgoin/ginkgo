@@ -48,7 +48,7 @@ FINAL_ZIP_ALIAS=Karenulgink-${TANGGAL}.zip
 ##----------------------------------------------------------##
 # Specify compiler.
 
-COMPILER=azure
+COMPILER=aosp
 
 ##----------------------------------------------------------##
 # Specify Linker
@@ -118,11 +118,11 @@ function cloneTC() {
 	then
         mkdir aosp-clang
         cd aosp-clang || exit
-	wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/ab73cd180863dbd17fdb8f20e39b33ab38030cf9/clang-r450784b.tar.gz
-        tar -xf clang*
+	wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/131683de7604e317f198eaf1b67dbcec549cdc74.tar.gz
+        tar -xf *
         cd .. || exit
-	git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9.git --depth=1 gcc
-	git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9.git  --depth=1 gcc32
+	git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9.git -b lineage-19.1 --depth=1 gcc
+	git clone https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9.git -b lineage-19.1 --depth=1 gcc32
 	PATH="${KERNEL_DIR}/aosp-clang/bin:${KERNEL_DIR}/gcc/bin:${KERNEL_DIR}/gcc32/bin:${PATH}"
 	
 	fi
@@ -245,6 +245,7 @@ START=$(date +"%s")
 	       #READELF=llvm-readelf \
 	       #OBJSIZE=llvm-size \
 	       V=$VERBOSE 2>&1 | tee error.log
+	       
 	elif [ -d ${KERNEL_DIR}/cosmic ];
 	   then
 	       make -j$(nproc --all) O=out \
@@ -261,6 +262,7 @@ START=$(date +"%s")
            #OBJDUMP=llvm-objdump \
            #STRIP=llvm-strip \
 	       V=$VERBOSE 2>&1 | tee error.log
+	       
 	elif [ -d ${KERNEL_DIR}/cosmic-clang ];
 	   then
 	       make -kj$(nproc --all) O=out \
@@ -277,6 +279,7 @@ START=$(date +"%s")
 	       #OBJDUMP=llvm-objdump \
 	       #STRIP=llvm-strip \
 	       V=$VERBOSE 2>&1 | tee error.log
+	       
 	elif [ -d ${KERNEL_DIR}/neutron ];
 	   then
 	       make -kj$(nproc --all) O=out \
@@ -308,6 +311,7 @@ START=$(date +"%s")
 	       STRIP=llvm-strip \
 	       OBJSIZE=llvm-size \
 	       V=$VERBOSE 2>&1 | tee error.log
+	       
 	elif [ -d ${KERNEL_DIR}/sdclang ];
        then
            make -kj$(nproc --all) O=out \
@@ -327,6 +331,7 @@ START=$(date +"%s")
 	       #READELF=llvm-readelf \
 	       #OBJSIZE=llvm-size \
 	       V=$VERBOSE 2>&1 | tee error.log
+	       
     elif [ -d ${KERNEL_DIR}/aosp-clang ];
        then
            make -kj$(nproc --all) O=out \
@@ -337,12 +342,12 @@ START=$(date +"%s")
 	       CLANG_TRIPLE=aarch64-linux-gnu- \
 	       CROSS_COMPILE=aarch64-linux-android- \
 	       CROSS_COMPILE_ARM32=arm-linux-androideabi- \
-	       #LD=${LINKER} \
-	       #AR=llvm-ar \
-	       #NM=llvm-nm \
-	       #OBJCOPY=llvm-objcopy \
-	       #OBJDUMP=llvm-objdump \
-           #STRIP=llvm-strip \
+	       LD=${LINKER} \
+	       AR=llvm-ar \
+	       NM=llvm-nm \
+	       OBJCOPY=llvm-objcopy \
+	       OBJDUMP=llvm-objdump \
+           STRIP=llvm-strip \
 	       #READELF=llvm-readelf \
 	       #OBJSIZE=llvm-size \
 	       V=$VERBOSE 2>&1 | tee error.log
