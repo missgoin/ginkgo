@@ -48,7 +48,7 @@ FINAL_ZIP_ALIAS=Karenulgink-${TANGGAL}.zip
 ##----------------------------------------------------------##
 # Specify compiler.
 
-COMPILER=aosp
+COMPILER=xrage
 
 ##----------------------------------------------------------##
 # Specify Linker
@@ -101,6 +101,11 @@ function cloneTC() {
 	git clone --depth=1 https://github.com/kdrag0n/proton-clang.git clang
 	PATH="${KERNEL_DIR}/clang/bin:$PATH"
 	
+	elif [ $COMPILER = "xrage" ];
+	then
+	git clone --depth=1 https://github.com/xyz-prjkt/xRageTC-clang.git -b main clang
+	PATH="${KERNEL_DIR}/clang/bin:$PATH"
+	
 	elif [ $COMPILER = "sdclang" ];
 	then
     git clone --depth=1 https://github.com/ZyCromerZ/SDClang.git --single-branch --branch="14" sdclang
@@ -120,13 +125,11 @@ function cloneTC() {
 	export KERNEL_CCOMPILE64_PATH="${KERNEL_DIR}/gcc64"
     export KERNEL_CCOMPILE64="aarch64-linux-android-"
     export PATH="$KERNEL_CCOMPILE64_PATH/bin:$PATH"
-    GCC_VERSION=$(aarch64-linux-gnu-gcc --version | grep "(GCC)" | sed 's|.*) ||')
 	
 	git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9.git -b lineage-19.1 gcc32
 	export KERNEL_CCOMPILE32_PATH="${KERNEL_DIR}/gcc32"
     export KERNEL_CCOMPILE32="arm-linux-androideabi-"
     export PATH="$KERNEL_CCOMPILE32_PATH/bin:$PATH"
-
 	
 	fi
 	
